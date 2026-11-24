@@ -37,3 +37,6 @@ functions:
       - http:
           path: customers/{customerId}/appointments
           method: post
+      - http:
+          path: appointments/{appointmentId}
+          method: patch
