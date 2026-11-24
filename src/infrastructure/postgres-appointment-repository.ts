@@ -118,6 +118,16 @@ export class PostgresAppointmentRepository implements AppointmentRepository {
             return slotConfictError(error);
         }
     }
+
+    async cancel(id: number): Promise<Appointment> {
+        const result = await pool.query(
+            `UPDATE appointments 
+             SET status = 'DISABLED', updated_at = NOW()
+             WHERE id = $1`,
+            [id]
+        );
+        return result.rows[0];
+    }
 }
 
 

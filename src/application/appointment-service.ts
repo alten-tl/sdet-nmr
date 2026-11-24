@@ -35,10 +35,10 @@ export class AppointmentService {
         return this.repository.create(input);
     }
     //-------------------------------------------------------
-    async reschedule(id:number, date: string, time?: string): Promise<Appointment> {
-        if(!Number.isInteger(id)){
-            throw new ValidationError("appointment id must be an integer");
-        }
+    async reschedule(id: number, date: string, time?: string): Promise<Appointment> {
+        // if (!Number.isInteger(id)) {
+        //     throw new ValidationError("appointment id must be an integer");
+        // }
         if (!isValidDate(date)) {
             throw new ValidationError("date is required with the format YYYY-MM-DD");
         }
@@ -46,12 +46,12 @@ export class AppointmentService {
             throw new ValidationError("time is required with the format HH:MM");
         }
 
-        const appointment = await this.repository.findById(id);
-        if (!appointment) {
-            throw new NotFoundError("Appointment not found");
-        }
+        const appointment = await this.findExisting(id);
+        // if (!appointment) {
+        //     throw new NotFoundError("Appointment not found");
+        // }
 
-        if(appointment.status === "DISABLED"){
+        if (appointment.status === "DISABLED") {
             throw new ConflictError("Cannot reschedule a disabled appointment");
         }
 
@@ -61,10 +61,34 @@ export class AppointmentService {
         return this.repository.updateSchedule(id, date, newTime);
     }
 
-    private async ensureSlotIsFree(date: string, time: string, excludedId?: number): Promise<void> {
-    if (await this.repository.isSlotTaken(date, time, excludedId)) {
-      throw new ConflictError("The time slot is already taken");
+    //-------------------------------------------------------
+
+    async cancel(id: number): Promise<Appointment> {
+        const appointment = await this.findExisting(id);
+
+        if (appointment.status === "DISABLED") {
+            throw new ConflictError("Appointment is already canceled");
+        }
+
+        return this.repository.cancel(id);
     }
-  }
+
+    //-------------------------------------------------------
+    private async ensureSlotIsFree(date: string, time: string, excludedId?: number): Promise<void> {
+        if (await this.repository.isSlotTaken(date, time, excludedId)) {
+            throw new ConflictError("The time slot is already taken");
+        }
+    }
+
+    private async findExisting(id: number): Promise<Appointment> {
+        if (!Number.isInteger(id)) {
+            throw new ValidationError("appointmentId must be an integer");
+        }
+        const appointment = await this.repository.findById(id);
+        if (!appointment) {
+            throw new NotFoundError("Appointment not found");
+        }
+        return appointment;
+    }
 
 }

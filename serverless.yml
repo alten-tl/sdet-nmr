@@ -40,3 +40,6 @@ functions:
       - http:
           path: appointments/{appointmentId}
           method: patch
+      - http:
+          path: appointments/{appointmentId}/cancel
+          method: patch
