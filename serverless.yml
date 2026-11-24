@@ -5,6 +5,17 @@ provider:
   runtime: nodejs24.x
   region: us-east-1
   stage: local
+  environment:
+    DB_HOST: postgres
+    DB_PORT: 5432
+    DB_USER: appointments
+    DB_PASSWORD: appointments
+    DB_NAME: appointments
+
+build:
+  esbuild:
+    external:
+      - pg-native
 
 plugins:
   - serverless-localstack
@@ -21,5 +32,5 @@ functions:
     handler: src/handler.handler
     events:
       - http:
-          path: hello
+          path: appointments
           method: get
