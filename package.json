@@ -1,0 +1,27 @@
+{
+  "name": "appointmentstest",
+  "version": "1.0.0",
+  "description": "Serverless REST API to manage vehicle service appointments. API Gateway + AWS Lambda (emulated locally with Floci) and PostgreSQL in Docker.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test serverless deploy --stage local"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alten-tl/sdet-nmr.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alten-tl/sdet-nmr/issues"
+  },
+  "homepage": "https://github.com/alten-tl/sdet-nmr#readme",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.164",
+    "@types/node": "^26.6.6",
+    "serverless-localstack": "^1.4.0",
+    "typescript": "^7.0.2"
+  }
+}

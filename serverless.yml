@@ -1,0 +1,25 @@
+service: appointments-api
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+  region: us-east-1
+  stage: local
+
+plugins:
+  - serverless-localstack
+
+custom:
+  localstack:
+    stages:
+      - local
+    host: http://localhost
+    edgePort: 4566
+
+functions:
+  api:
+    handler: src/handler.handler
+    events:
+      - http:
+          path: hello
+          method: get
