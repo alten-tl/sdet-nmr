@@ -37,10 +37,12 @@ export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
+    //-------------------------------------------------------
     if (event.httpMethod === "GET" && event.resource === "/appointments") {
       const date = event.queryStringParameters?.date ?? "";
       return response(200, await service.listByDate(date));
     }
+    //-------------------------------------------------------
     if (event.httpMethod === "POST" && event.resource === "/customers/{customerId}/appointments") {
       const body = parseBody(event.body);
       const appointment = await service.create({
@@ -52,8 +54,19 @@ export const handler = async (
       });
       return response(201, appointment);
     }
+    //-------------------------------------------------------
+    if (event.httpMethod === "PATCH" && event.resource === "/appointments/{appointmentId}") {
+      const body = parseBody(event.body);
+      const appointment = await service.reschedule(
+        Number(event.pathParameters?.appointmentId),
+        String(body.date ?? ""),
+        body.time === undefined ? undefined : String(body.time)
+      );
+      return response(200, appointment);
 
+    }
 
+    //-------------------------------------------------------
     return response(404, { message: "Not Found" });
 
   } catch (error) {

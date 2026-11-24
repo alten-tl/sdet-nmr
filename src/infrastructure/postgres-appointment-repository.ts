@@ -25,13 +25,29 @@ const COLUMNS = `
 //UNIQUE_CONSTRAINT_VIOLATION FOR POSTGRES IS 23505
 const UNIQUE_CONSTRAINT_VIOLATION = "23505";
 
+const slotConfictError = (error: unknown): never => {
+    if (error instanceof Error && (error as any).code === UNIQUE_CONSTRAINT_VIOLATION) {
+        throw new ConflictError("Slot already taken");
+    }
+    throw error;
+}
+
 export class PostgresAppointmentRepository implements AppointmentRepository {
+
     async findByDate(date: string): Promise<Appointment[]> {
         const result = await pool.query(
             `SELECT ${COLUMNS} FROM appointments WHERE appointment_date = $1 ORDER BY appointment_time`,
             [date]
         );
         return result.rows;
+    }
+
+    async findById(id: number): Promise<Appointment | null> {
+        const result = await pool.query(
+            `SELECT ${COLUMNS} FROM appointments WHERE id = $1`,
+            [id]
+        );
+        return result.rows[0] || null;
     }
 
     async customerExists(customerId: number): Promise<boolean> {
@@ -50,10 +66,14 @@ export class PostgresAppointmentRepository implements AppointmentRepository {
         return result.rows.length > 0;
     }
 
-    async isSlottaken(date: string, time: string): Promise<boolean> {
+    async isSlotTaken(date: string, time: string, excludedId?: number): Promise<boolean> {
         const result = await pool.query(
-            `SELECT 1 FROM appointments WHERE appointment_date = $1 AND appointment_time = $2 and status = 'ENABLED'`,
-            [date, time]
+            `SELECT 1 FROM appointments 
+             WHERE appointment_date = $1 
+             AND appointment_time = $2 
+             AND status = 'ENABLED'
+             AND ($3::int IS NULL OR id <> $3)`,
+            [date, time, excludedId ?? null]
         );
         return result.rows.length > 0;
     }
@@ -74,12 +94,29 @@ export class PostgresAppointmentRepository implements AppointmentRepository {
             return result.rows[0];
 
         } catch (error: any) {
-            if (error.code === UNIQUE_CONSTRAINT_VIOLATION) {
-                throw new ConflictError("Slot already taken");
-            }
-            throw error;
+            // if (error.code === UNIQUE_CONSTRAINT_VIOLATION) {
+            //     throw new ConflictError("Slot already taken");
+            // }
+            // throw error;
+            return slotConfictError(error);
         }
+    }
 
+    async updateSchedule(id: number, date: string, time: string): Promise<Appointment> {
+        try {
+            const result = await pool.query(
+                `UPDATE appointments 
+             SET appointment_date = $1, appointment_time = $2, updated_at = NOW()
+             WHERE id = $3
+             RETURNING ${COLUMNS}`,
+                [date, time, id]
+            );
+
+            return result.rows[0];
+
+        } catch (error) {
+            return slotConfictError(error);
+        }
     }
 }
 
