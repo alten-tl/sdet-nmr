@@ -1,0 +1,54 @@
+{
+  "info": {
+    "name": "Appointments API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4566/restapis/REPLACE_API_ID/local/_user_request_"
+    }
+  ],
+  "item": [
+    {
+      "name": "List appointments by date",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/appointments?date=2026-12-01"
+      }
+    },
+    {
+      "name": "Create appointment",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"vehicleId\": 1,\n  \"date\": \"2026-12-03\",\n  \"time\": \"11:00\",\n  \"comments\": \"Tire rotation\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/customers/1/appointments"
+      }
+    },
+    {
+      "name": "Reschedule appointment",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"date\": \"2026-12-05\",\n  \"time\": \"16:00\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/appointments/4"
+      }
+    },
+    {
+      "name": "Cancel appointment",
+      "request": {
+        "method": "PATCH",
+        "url": "{{baseUrl}}/appointments/4/cancel"
+      }
+    }
+  ]
+}
