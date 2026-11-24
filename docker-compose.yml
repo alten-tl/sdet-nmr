@@ -17,6 +17,7 @@ services:
       - POSTGRES_DB=appointments
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
 
 
 networks:
