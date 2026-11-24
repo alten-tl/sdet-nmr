@@ -1,0 +1,45 @@
+service: appointments-api
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+  region: us-east-1
+  stage: local
+  environment:
+    DB_HOST: postgres
+    DB_PORT: 5432
+    DB_USER: appointments
+    DB_PASSWORD: appointments
+    DB_NAME: appointments
+
+build:
+  esbuild:
+    external:
+      - pg-native
+
+plugins:
+  - serverless-localstack
+
+custom:
+  localstack:
+    stages:
+      - local
+    host: http://localhost
+    edgePort: 4566
+
+functions:
+  api:
+    handler: src/handler.handler
+    events:
+      - http:
+          path: appointments
+          method: get
+      - http:
+          path: customers/{customerId}/appointments
+          method: post
+      - http:
+          path: appointments/{appointmentId}
+          method: patch
+      - http:
+          path: appointments/{appointmentId}/cancel
+          method: patch
