@@ -8,4 +8,5 @@ export interface AppointmentRepository {
   isSlotTaken(date: string, time: string, excludeId?: number): Promise<boolean>;
   create(appointment: NewAppointment): Promise<Appointment>;
   updateSchedule(id: number, date: string, time: string): Promise<Appointment>;
+  cancel(id: number): Promise<Appointment>;
 }

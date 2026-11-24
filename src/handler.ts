@@ -67,6 +67,12 @@ export const handler = async (
     }
 
     //-------------------------------------------------------
+    if (event.httpMethod === "PATCH" && event.resource === "/appointments/{appointmentId}/cancel") {
+      const appointment = await service.cancel(Number(event.pathParameters?.appointmentId));
+      return response(200, appointment);
+    }
+
+    //-------------------------------------------------------
     return response(404, { message: "Not Found" });
 
   } catch (error) {
