@@ -34,3 +34,6 @@ functions:
       - http:
           path: appointments
           method: get
+      - http:
+          path: customers/{customerId}/appointments
+          method: post
